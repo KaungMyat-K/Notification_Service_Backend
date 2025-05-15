@@ -70,12 +70,13 @@ $(document).ready(function() {
     
     $("#sendButton").on('click',function(e) {
         e.preventDefault();
-        
+        console.log("Exchange name input value:", $("#exchangeName").val());
         const notificationData = {
             //projectId: $("#projectSelect").val(),
         	//clientId: $("#clientSelect").val(),
-        	projectId:	$("#projectSelect option:selected").text(),
-        	clientId: $("#clientSelect option:selected").text(),
+        	projectId:	$("#projectSelect option:selected").text() || "",
+        	//clientId: $("#clientSelect option:selected").text(),
+        	clientId: $("#exchangeName").val(),
             title: $("#notificationTitle").val(),
             text: $("#notificationText").val(),
             imageUrl: $(".image-url-input").val(),

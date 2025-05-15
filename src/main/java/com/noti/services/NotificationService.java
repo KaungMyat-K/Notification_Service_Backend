@@ -51,7 +51,7 @@ public class NotificationService {
 	    }
 	    
 	    //Send Message to Queue
-	    public static void sendMessage(String exchangeName,String message, String queueName) 
+	    public static void sendMessage(String exchangeName,String message) 
 	            								throws IOException, TimeoutException {
 	        try (Connection connection = RabbitMQConfig.getConnection();
 	             Channel channel = connection.createChannel()) {
@@ -68,22 +68,4 @@ public class NotificationService {
 	    
 	   
 	    
-//	    public static void sendNotification(NotificationMessage message) 
-//	            throws IOException, TimeoutException {
-//	        
-//	        try (Connection connection = RabbitMQConfig.getConnection();
-//	             Channel channel = connection.createChannel()) {
-//	            
-//	            String jsonMessage = new Gson().toJson(message);
-//	            
-//	            channel.basicPublish(
-//	                RabbitMQConfig.getExchangeName(),
-//	                RabbitMQConfig.getRoutingKey(),
-//	                MessageProperties.PERSISTENT_TEXT_PLAIN,
-//	                jsonMessage.getBytes(StandardCharsets.UTF_8)
-//	            );
-//	            
-//	            System.out.println(" [x] Sent '" + jsonMessage + "'");
-//	        }
-//	    }
 }

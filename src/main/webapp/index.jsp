@@ -16,7 +16,7 @@
       <div class="wrapper">
         <div class="notification-form">
           <h2>Notification</h2>
-
+ <!--  
           <div class="select-container">
 		    <div>
 		        <label for="projectSelect">Project</label>
@@ -31,7 +31,10 @@
 		        </select>
 		    </div>
 		</div>
-
+-->
+		 <label for="exchangeName">Exchange Name</label>
+          <input id="exchangeName" type="text" placeholder="Enter Exchange Name" />
+          
           <label for="notificationTitle">Notification title</label>
           <input id="notificationTitle" type="text" placeholder="Enter optional title" />
 
