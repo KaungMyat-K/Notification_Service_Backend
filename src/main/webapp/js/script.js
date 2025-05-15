@@ -72,20 +72,21 @@ $(document).ready(function() {
         e.preventDefault();
         
         const notificationData = {
-            projectId: $("#projectSelect").val(),
-            clientId: $("#clientSelect").val(),
+            //projectId: $("#projectSelect").val(),
+        	//clientId: $("#clientSelect").val(),
+        	projectId:	$("#projectSelect option:selected").text(),
+        	clientId: $("#clientSelect option:selected").text(),
             title: $("#notificationTitle").val(),
             text: $("#notificationText").val(),
             imageUrl: $(".image-url-input").val(),
             senderName: $("#notificationName").val() || "System"
         };
-        
         $.post(`/${BASE_URL}/noti`, notificationData)
             .done(function(response) {
-                showNotification("Notification sent successfully!", "success");
+            	console.log("Notification sent successfully!", "success");
             })
             .fail(function(error) {
-                showNotification("Failed to send notification", "error");
+            	console.log("Failed to send notification", "error");
                 console.error("Error:", error);
             });
     });

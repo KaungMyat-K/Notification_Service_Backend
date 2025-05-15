@@ -3,6 +3,8 @@ package com.noti.utility;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.coyote.BadRequestException;
+
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -30,26 +32,28 @@ public class RabbitMQConfig {
     }
 
     public static Connection getConnection() throws IOException, TimeoutException {
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(HOST);
-        factory.setPort(PORT);
-        factory.setUsername(USERNAME);
-        factory.setPassword(PASSWORD);
-        return factory.newConnection();
+    	
+    		ConnectionFactory factory = new ConnectionFactory();
+            factory.setHost(HOST);
+            factory.setPort(PORT);
+            factory.setUsername(USERNAME);
+            factory.setPassword(PASSWORD);
+            
+            return factory.newConnection();
     }
 
-    public static void declareExchangeAndQueue() throws IOException, TimeoutException {
-        try (Connection connection = getConnection();
-             Channel channel = connection.createChannel()) {
-            
-            
-            channel.exchangeDeclare(EXCHANGE_NAME, "direct", true);
-            
-            
-            channel.queueDeclare(QUEUE_NAME, true, false, false, null);
-            
-           
-            channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, ROUTING_KEY);
-        }
-    }
+//    public static void declareExchangeAndQueue() throws IOException, TimeoutException {
+//        try (Connection connection = getConnection();
+//             Channel channel = connection.createChannel()) {
+//            
+//            
+//            channel.exchangeDeclare(EXCHANGE_NAME, "direct", true);
+//            
+//            
+//            channel.queueDeclare(QUEUE_NAME, true, false, false, null);
+//            
+//           
+//            channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, ROUTING_KEY);
+//        }
+//    }
 }
