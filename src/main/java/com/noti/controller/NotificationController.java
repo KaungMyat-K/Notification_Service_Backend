@@ -49,10 +49,26 @@ public class NotificationController extends HttpServlet {
 	 	        	    .imageUrl(request.getParameter("imageUrl"))
 	 	        	    .senderName("sender : "+request.getParameter("senderName"))
 	 	        	    .timestamp(new Date())
+	 	        	   .device(request.getParameter("device"))
 	 	        	    .build();
     			String text = new Gson().toJson(message);
     			
-    			NotificationService.sendMessage(message.getClientId(), text);
+    			String routingKey ;
+				if(message.getDevice().equalsIgnoreCase("all")) {
+					routingKey = String.format("%s.%s.%s",
+												message.getExchangeName(),
+												"device",
+											    message.getDevice()
+											    );
+				}else {
+					routingKey = String.format("%s.%s.%s",
+												message.getExchangeName(),
+											    "device", 
+											    message.getDevice()
+											    );	
+				}	
+				System.out.println("routing key >>>> "+ routingKey);
+				NotificationService.sendMessage(message.getExchangeName(),routingKey,text);
     			
 	        	response.getWriter().write("Notification sent successfully!");
 		        } catch (Exception e) {

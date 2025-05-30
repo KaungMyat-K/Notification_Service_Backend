@@ -76,6 +76,8 @@ $(document).ready(function() {
         	//clientId: $("#clientSelect").val(),
         	projectId:	$("#projectSelect option:selected").text() || "",
         	//clientId: $("#clientSelect option:selected").text(),
+        	exchangeName: $("#exchangeName").val(),
+        	device: $("#deviceSelect").val(),
         	clientId: $("#exchangeName").val(),
             title: $("#notificationTitle").val(),
             text: $("#notificationText").val(),

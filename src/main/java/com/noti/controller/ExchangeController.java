@@ -21,6 +21,7 @@ public class ExchangeController extends HttpServlet {
 			String clientId;
 			String userId;
 			String generatedId;
+			String device;
 	};
 
 
@@ -40,12 +41,17 @@ public class ExchangeController extends HttpServlet {
 	        ReqData data = gson.fromJson(jsonBody, ReqData.class);
 	        
 	        //create Exchange
-	        NotificationService.createExchange(data.clientId);
-	        NotificationService.createExchange(data.userId);
+	        String exchangeName = String.format("%s/%s", data.clientId, data.userId);
+	        String routingKey = String.format("%s.%s.%s",exchangeName,"device",data.device);
+	        
+	        
+	        //create Exchange
+	        NotificationService.createExchange(data.clientId,"topic");
+	        NotificationService.createExchange(exchangeName,"topic");
 	        
 	        //create Queue
-	        NotificationService.createQueue(data.clientId,data.generatedId);
-	        NotificationService.createQueue(data.userId, data.generatedId);
+	        NotificationService.createQueue(data.clientId,data.generatedId,routingKey);
+	        NotificationService.createQueue(exchangeName,data.generatedId,routingKey);
 	        
 	        response.setContentType("application/json");
 	        response.getWriter().write("{\"status\": \"created successfully\"}");

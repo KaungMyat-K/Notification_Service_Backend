@@ -32,6 +32,20 @@
 		    </div>
 		</div>
 -->
+		<div class="select-container">
+		    <div>
+		        <label for="deviceSelect">Device</label>
+		        <select id="deviceSelect" name="device">
+		            <option value="">Select Device</option>
+		            <option value="all">All</option>
+		            <option value="android">Android</option>
+		            <option value="ios">IOS</option>            
+		        </select>
+		    </div>
+		</div>	
+		 <label for="exchangeName">Exchange Name</label>
+          <input id="exchangeName" type="text" placeholder="Enter Exchange Name" />
+          
 		 <label for="exchangeName">Exchange Name</label>
           <input id="exchangeName" type="text" placeholder="Enter Exchange Name" />
           

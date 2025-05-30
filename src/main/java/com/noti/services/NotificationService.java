@@ -16,8 +16,8 @@ import com.rabbitmq.client.MessageProperties;
 public class NotificationService {
 	
 	 
-	   //Create Exchange
-	   public static void createExchange(String exchangeName) 
+	//Create Exchange
+	   public static void createExchange(String exchangeName,String type) 
 	            							throws IOException, TimeoutException {
 	        try (Connection connection = RabbitMQConfig.getConnection()) {
 	        	 Channel channel = connection.createChannel();
@@ -26,7 +26,8 @@ public class NotificationService {
 	                 channel.exchangeDeclarePassive(exchangeName);
 	             } catch (IOException e) {
 	                 channel = connection.createChannel();
-	                 channel.exchangeDeclare(exchangeName, "direct", true, true, null);
+	                 channel.exchangeDeclare(exchangeName, type, true, false, null);
+	                 System.out.println("Exchange '" + exchangeName + "' created successfully");
 	             } finally {
 	                 if (channel != null && channel.isOpen()) {
 	                     channel.close();
@@ -36,7 +37,7 @@ public class NotificationService {
 	    }
 	    
 	    //Create Queue
-	    public static void createQueue(String exchangeName,String queueName) 
+	    public static void createQueue(String exchangeName,String queueName,String routingKey) 
 	                                		 throws IOException, TimeoutException {
 	        try (Connection connection = RabbitMQConfig.getConnection();
 	             Channel channel = connection.createChannel()) {
@@ -45,24 +46,29 @@ public class NotificationService {
 	        	arguments.put("x-message-ttl", 604800000);
 	            
 	            channel.queueDeclare(queueName, true, false, false, arguments);
-	            channel.queueBind(queueName, exchangeName, RabbitMQConfig.getRoutingKey());
+	            channel.queueBind(queueName, exchangeName, routingKey);
+	            
+	            //send all device
+	            String routingKey_ALL = String.format("%s.%s.%s",exchangeName,"device","all");
+	            channel.queueBind(queueName, exchangeName, routingKey_ALL);
+	            
 	            System.out.println("Queue '" + queueName + "' created successfully");
 	        }
 	    }
 	    
 	    //Send Message to Queue
-	    public static void sendMessage(String exchangeName,String message) 
+	    public static void sendMessage(String exchangeName,String routingKey,String message) 
 	            								throws IOException, TimeoutException {
 	        try (Connection connection = RabbitMQConfig.getConnection();
 	             Channel channel = connection.createChannel()) {
 	       
 	            channel.basicPublish(exchangeName,
-	            					 RabbitMQConfig.getRoutingKey(),
+	            					 routingKey,
 		            				 MessageProperties.PERSISTENT_TEXT_PLAIN,
 		            				 message.getBytes(StandardCharsets.UTF_8)
 		            				 );
 	            System.out.println("Sent '" + message + "' to exchange '" + 
-	                              exchangeName + "' with routing key '" + RabbitMQConfig.getRoutingKey() + "'");
+	                              exchangeName + "' with routing key '" + routingKey + "'");
 	        }
 	    }
 	    
