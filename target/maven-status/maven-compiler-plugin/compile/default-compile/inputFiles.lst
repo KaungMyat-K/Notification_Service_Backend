@@ -1,0 +1,6 @@
+C:\Users\KM\eclipse-workspace-2\notification_service_backend\src\main\java\com\mbc\model\NotificationMessage.java
+C:\Users\KM\eclipse-workspace-2\notification_service_backend\src\main\java\com\mbc\services\NotificationService.java
+C:\Users\KM\eclipse-workspace-2\notification_service_backend\src\main\java\com\mbc\servlet\NotificationServlet.java
+C:\Users\KM\eclipse-workspace-2\notification_service_backend\src\main\java\com\mbc\servlet\NotificationSetupServlet.java
+C:\Users\KM\eclipse-workspace-2\notification_service_backend\src\main\java\com\mbc\utility\ConfigLoaderListener.java
+C:\Users\KM\eclipse-workspace-2\notification_service_backend\src\main\java\com\mbc\utility\RabbitMQConfig.java
