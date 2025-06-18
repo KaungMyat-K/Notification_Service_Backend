@@ -71,7 +71,7 @@ public class NotificationService {
 	    }
 	    
 	  //Remove Queue
-	    public static void removeQueue(String exchangeName,String queueName,String routingKey) 
+	    public static void removeQueue(String queueName) 
 							throws IOException, TimeoutException {
 			try (Connection connection = RabbitMQConfig.getConnection();
 			Channel channel = connection.createChannel()) {
