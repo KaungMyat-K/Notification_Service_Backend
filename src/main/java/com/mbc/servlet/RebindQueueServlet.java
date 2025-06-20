@@ -11,11 +11,19 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.mbc.model.RebindQueueRequest;
 import com.mbc.services.NotificationService;
+import com.mbc.servicesImpl.NotificationServiceImpl;
+import com.mbc.utility.ResponseUtils;
 
 @WebServlet("/rebindQueue")
 public class RebindQueueServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
+	private NotificationService notificationService;
+	
+	@Override
+    public void init() {
+        this.notificationService = new NotificationServiceImpl();
+    }
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
@@ -30,22 +38,39 @@ public class RebindQueueServlet extends HttpServlet {
 	        String jsonBody = sb.toString();
 
 	        Gson gson = new Gson();
-	        RebindQueueRequest data = gson.fromJson(jsonBody, RebindQueueRequest.class);	   
-	        
-	        String routingKey = String.format("%s.%s.%s",data.getFrom(),"device",data.getDevice());
+	        RebindQueueRequest data = gson.fromJson(jsonBody, RebindQueueRequest.class);	   	        	        
 	        
 	        //unbind Exchange
-	        NotificationService.unbindQueue(data.getFrom(), data.getQueue(), routingKey);
+	        String exchangeToUnbind = data.getOldExchange().contains("_") ? 
+	        							data.getOldExchange().split("_")[0] : 
+	        								String.format("%s_%s",data.getOldExchange(),data.getUserId());																				 
+	        
+	        notificationService.unbindQueue(data.getOldExchange(), 
+												data.getQueue(), 
+												notificationService.createRoutingKey(data.getOldExchange(),data.getDevice())
+												);
+	        notificationService.unbindQueue(exchangeToUnbind, 
+												data.getQueue(), 
+												notificationService.createRoutingKey(exchangeToUnbind,data.getDevice())
+												);
+	        	        	        
+	        //create if exchange not exists 
+	        notificationService.createExchange(data.getNewExchange());        
 	        
 	        //rebind Queue
-	        String renewRoutingKey = String.format("%s.%s.%s",data.getTo(),"device",data.getDevice());
-	        NotificationService.rebindQueue(data.getTo(), data.getQueue(), renewRoutingKey);
+	        String renewRoutingKey = String.format("%s.%s.%s",data.getNewExchange(),"device",data.getDevice());
+	        notificationService.rebindQueue(data.getNewExchange(), data.getQueue(), renewRoutingKey);
 	                
-	        response.setContentType("application/json");
-	        response.getWriter().write("{\"status\": \"rebind queue successfully\"}");
-		} catch (Exception e) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("Error rebinding exchange and queue: " + e.getMessage());
+	        ResponseUtils.sendSuccess(
+				    			response,
+				    			"rebound queue successfully"
+								);
+		} catch (Exception e) {		
+			ResponseUtils.sendError(
+							    response,
+							    HttpServletResponse.SC_BAD_REQUEST,
+							    "Error while rebinding exchange and queue: " + e.getMessage()
+							);								
             e.printStackTrace();
 		}
 	}

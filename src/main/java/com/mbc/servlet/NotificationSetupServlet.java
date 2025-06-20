@@ -11,11 +11,20 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.mbc.model.NotificationSetupRequest;
 import com.mbc.services.NotificationService;
+import com.mbc.servicesImpl.NotificationServiceImpl;
+import com.mbc.utility.ResponseUtils;
 
 
 @WebServlet("/setup")
 public class NotificationSetupServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	
+	private NotificationService notificationService;
+		
+	@Override
+	public void init() {
+	     this.notificationService = new NotificationServiceImpl();
+	}
 	
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -33,29 +42,47 @@ public class NotificationSetupServlet extends HttpServlet {
 	        Gson gson = new Gson();
 	        NotificationSetupRequest data = gson.fromJson(jsonBody, NotificationSetupRequest.class);
 	        
-	        String exchangeName = data.getClientId()+"_"+data.getUserId();
+	        if(isNullOrEmpty(data.getClientId()) ||
+	           isNullOrEmpty(data.getUserId()) ||
+	           isNullOrEmpty(data.getDevice())
+	          ) {
+	        	ResponseUtils.sendError(
+								    response,
+								    HttpServletResponse.SC_BAD_REQUEST,
+								    "Error while creating exchange and queue: Required fields are missing or empty"
+	        					);
+	            return;
+	        }
 	        
-	        String clientRoutingKey = String.format("%s.%s.%s",data.getClientId(),"device",data.getDevice());
-	        
-	        String userRoutingKey = String.format("%s.%s.%s",exchangeName,"device",data.getDevice());
+	        String exchangeName = data.getClientId()+"_"+data.getUserId();	       	        
 	        
 	        //create Exchange
-	        NotificationService.createExchange(data.getClientId());
-	        NotificationService.createExchange(exchangeName);
+	        notificationService.createExchange(data.getClientId());
+	        notificationService.createExchange(exchangeName);
 	        
 	        //create Queue
-	        NotificationService.createQueue(data.getClientId(),data.getGeneratedId(),clientRoutingKey);
-	        NotificationService.createQueue(exchangeName,data.getGeneratedId(),userRoutingKey);
-	        
-	        
-	        response.setContentType("application/json");
-	        response.getWriter().write("{\"status\": \"created successfully\"}");
+	        notificationService.createQueue(data.getClientId(),
+	        								data.getGeneratedId(),
+	        								notificationService.createRoutingKey(data.getClientId(), data.getDevice())
+	        								);
+	        notificationService.createQueue(exchangeName,
+	        								data.getGeneratedId(),
+	        								notificationService.createRoutingKey(exchangeName, data.getDevice())
+	        								);
+	        	        
+	        ResponseUtils.sendSuccess(
+	        	    			response,
+	        	    			"created notification setup successfully"
+	        					);
 		} catch (Exception e) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("Error creating exchange and queue: " + e.getMessage());
+			ResponseUtils.sendError(
+						    response,
+						    HttpServletResponse.SC_BAD_REQUEST,
+						    "Error while creating exchange and queue: " + e.getMessage()
+						);
             e.printStackTrace();
 		}
-	}
+	}	
 	
 	@Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp) {
@@ -68,6 +95,8 @@ public class NotificationSetupServlet extends HttpServlet {
         response.setHeader("Access-Control-Allow-Headers", "Content-Type");
     }
 	
-	
+    private boolean isNullOrEmpty(String value) {
+	    return value == null || value.trim().isEmpty();
+	}
 
 }

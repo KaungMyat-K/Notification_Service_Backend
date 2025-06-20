@@ -2,16 +2,17 @@ package com.mbc.model;
 
 public class RebindQueueRequest {
 
-	private String from;
+	private String oldExchange;
 	private String queue;
 	private String device;
-	private String to;
+	private String newExchange;
+	private String userId;
 	
-	public String getFrom() {
-		return from;
+	public String getOldExchange() {
+		return oldExchange;
 	}
-	public void setFrom(String from) {
-		this.from = from;
+	public void setOldExchange(String oldExchange) {
+		this.oldExchange = oldExchange;
 	}
 	public String getQueue() {
 		return queue;
@@ -25,13 +26,17 @@ public class RebindQueueRequest {
 	public void setDevice(String device) {
 		this.device = device;
 	}
-	public String getTo() {
-		return to;
+	public String getNewExchange() {
+		return newExchange;
 	}
-	public void setTo(String to) {
-		this.to = to;
+	public void setNewExchange(String newExchange) {
+		this.newExchange = newExchange;
 	}
-	
-	
-		
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+			
 }
