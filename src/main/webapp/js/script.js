@@ -38,6 +38,21 @@ $(document).ready(function() {
     $("#notificationTitle, #notificationText, .image-url-input").on('input', updatePreview);
     $(".notification-form select").on('change', updatePreview);
     
+ // Trigger hidden file input on upload button click    
+    $(".upload-button").on('click', function (e) {
+    	console.log("Upload button clicked");
+        $("#fileInput").click(); 
+    });
+    
+    $("#fileInput").on('change', function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            const imageUrl = URL.createObjectURL(file);
+            console.log("Image selected:", imageUrl);
+            $(".image-url-input").val(imageUrl).trigger("input");
+        }
+    });
+    
     $("#sendButton").on('click',function(e) {
         e.preventDefault();
         console.log("Exchange name input value:", $("#exchangeName").val());
@@ -46,7 +61,8 @@ $(document).ready(function() {
         	device: $("#device").val(),
             title: $("#notificationTitle").val(),
             text: $("#notificationText").val(),
-            notificationName: $("#notificationName").val() || "System"
+            notificationName: $("#notificationName").val() || "System",
+            imageUrl: $(".image-url-input").val() || null
         };
         $.post(`/${BASE_URL}/send`, notificationData)
             .done(function(response) {

@@ -38,10 +38,25 @@
           <label for="notificationName">Notification name (optional)</label>
           <input id="notificationName" type="text" placeholder="Enter optional name" />
 
+         <label>Notification image (optional)</label>
+		<div class="image-input-container">
+		  <input
+		    type="text"
+		    id="notificationImage"
+		    placeholder="Example: https://yourapp.com/image.png"
+		    class="image-url-input"
+		  />
+		  <button type="button" class="upload-button" id="uploadBtn">
+		    <i class="fas fa-upload"></i>
+		  </button>
+		  <input type="file" id="fileInput" accept="image/*" style="display: none;" />
+		</div>
+          
           <button id="sendButton" type="button" class="send-button">Send Notification</button>
         </div>
 
         <div class="preview-container">
+        <!-- android -->
           <div class="device-preview">
             <div class="phone">
               <div class="notch">
