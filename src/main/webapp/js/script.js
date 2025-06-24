@@ -38,18 +38,40 @@ $(document).ready(function() {
     $("#notificationTitle, #notificationText, .image-url-input").on('input', updatePreview);
     $(".notification-form select").on('change', updatePreview);
     
- // Trigger hidden file input on upload button click    
-    $(".upload-button").on('click', function (e) {
-    	console.log("Upload button clicked");
-        $("#fileInput").click(); 
+    const $input = $("#notificationImage");
+    const $uploadBtn = $("#uploadBtn");
+    const $fileInput = $("#fileInput");
+
+    $input.on("input", function () {
+        const hasValue = $(this).val().trim() !== "";
+        $uploadBtn.prop("disabled", hasValue);
+        if (!hasValue) {
+            $fileInput.val("");
+            $input.prop("disabled", false);
+        }
     });
-    
-    $("#fileInput").on('change', function (event) {
+
+    $uploadBtn.on("click", function () {
+        if (!$(this).prop("disabled")) {
+            console.log("Upload button clicked");
+            $fileInput.click();
+        }
+    });
+
+    $fileInput.on("change", function (event) {
         const file = event.target.files[0];
         if (file) {
+            const maxSizeBytes = 2 * 1024 * 1024;
+
+            if (file.size > maxSizeBytes) {
+                alert("File size exceeds 2 MB limit.");
+                $(this).val(""); 
+                return;
+            }
             const imageUrl = URL.createObjectURL(file);
             console.log("Image selected:", imageUrl);
-            $(".image-url-input").val(imageUrl).trigger("input");
+            $input.val(imageUrl).trigger("input");
+            $input.prop("disabled", true); 
         }
     });
     
