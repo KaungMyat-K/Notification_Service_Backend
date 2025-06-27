@@ -30,13 +30,16 @@
 		    </select>
           
           <label for="notificationTitle">Notification title</label>
-          <input id="notificationTitle" type="text" placeholder="Enter optional title" />
-
+          <input id="notificationTitle" type="text" placeholder="Enter notification title" />
+          
           <label for="notificationText">Notification text</label>
-          <input id="notificationText" type="text" placeholder="Enter notification text" />
+          <textarea
+            id="notificationText"
+            placeholder="Enter notification text"
+          ></textarea>
           
           <label for="notificationName">Notification name (optional)</label>
-          <input id="notificationName" type="text" placeholder="Enter optional name" />
+          <input id="notificationName" type="text" placeholder="Enter notification name" />
 
          <label>Notification image (optional)</label>
 		<div class="image-input-container">

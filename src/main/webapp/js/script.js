@@ -89,11 +89,11 @@ $(document).ready(function() {
         $.post(`/${BASE_URL}/send`, notificationData)
             .done(function(response) {
             	showToast("Notification sent successfully!", "success");
-            	console.log("Notification sent successfully!", "success");
+            	console.log("Notification sent successfully!", response.message);
             })
             .fail(function(error) {
             	showToast("Failed to send notification", "error");
-            	console.log("Failed to send notification", "error");
+            	console.log("Failed to send notification", error.message);
                 console.error("Error:", error);
             });
     }); 

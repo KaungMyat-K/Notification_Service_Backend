@@ -54,7 +54,7 @@ public class NotificationServlet extends HttpServlet {
 		     	 		return;
 		     	 	}
 		     	 		
-		     	 	if(notificationService.isExists(message.getExchangeName())) {
+		     	 	if(!notificationService.isExists(message.getExchangeName())) {
 							ResponseUtils.sendError(
 										    response,
 										    HttpServletResponse.SC_BAD_REQUEST,

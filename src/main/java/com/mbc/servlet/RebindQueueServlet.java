@@ -53,7 +53,10 @@ public class RebindQueueServlet extends HttpServlet {
 												data.getQueue(), 
 												notificationService.createRoutingKey(exchangeToUnbind,data.getDevice())
 												);
-	        	        	        
+	        
+	        //create exchange for a single user
+	        notificationService.createExchange(data.getNewExchange());
+	        
 	        //create if exchange not exists 
 	        notificationService.createExchange(data.getNewExchange());        
 	        
