@@ -118,7 +118,7 @@ public class NotificationServiceImpl implements NotificationService {
 			    String allDevicesRoutingKey  = createRoutingKey(exchangeName,"all");
 			    channel.queueUnbind(queueName, exchangeName, allDevicesRoutingKey);
 			    
-			    System.out.println("Queue '" + queueName + "' unbound successfully");
+			    System.out.println("Queue '" + queueName + "' unbound from Exchange '"+exchangeName +"' successfully");
 			
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -139,7 +139,7 @@ public class NotificationServiceImpl implements NotificationService {
 				 String allDevicesRoutingKey  = createRoutingKey(exchangeName,"all");
 		         channel.queueBind(queueName, exchangeName, allDevicesRoutingKey);
 			    
-			    System.out.println("Queue '" + queueName + "' rebound successfully");
+			    System.out.println("Queue '" + queueName + "' rebound to Echange '"+exchangeName+"' successfully");
 			
 			} catch (IOException e) {
 				e.printStackTrace();

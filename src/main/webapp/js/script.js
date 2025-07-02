@@ -84,7 +84,7 @@ $(document).ready(function() {
             title: $("#notificationTitle").val(),
             text: $("#notificationText").val(),
             notificationName: $("#notificationName").val() || "System",
-            imageUrl: $(".image-url-input").val() || null
+            imageUrl: $(".image-url-input").val() || ""
         };
         $.post(`/${BASE_URL}/send`, notificationData)
             .done(function(response) {

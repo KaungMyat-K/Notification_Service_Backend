@@ -1,5 +1,6 @@
 package com.mbc.servlet;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Date;
 
@@ -30,16 +31,19 @@ public class NotificationServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		 try {	        
 		     	
-		     	 NotificationMessage message = new NotificationMessage.Builder()
-			        	    .exchangeName(request.getParameter("exchangeName"))
-			        	    .device(request.getParameter("device"))
-			        	    .title(request.getParameter("title"))
-			        	    .text(request.getParameter("text"))
-			        	    .notificationName(request.getParameter("notificationName"))
-			        	    .timestamp(new Date())
-			        	    .build();
-		     	 	String text = new Gson().toJson(message);
-		     	 	
+			 	NotificationMessage message = new NotificationMessage.Builder()
+		        	    .exchangeName(request.getParameter("exchangeName"))
+		        	    .device(request.getParameter("device"))
+		        	    .title(request.getParameter("title"))
+		        	    .text(request.getParameter("text"))
+		        	    .notificationName(request.getParameter("notificationName"))
+		        	    .timestamp(new Date())
+		        	    .build();
+	     	 		String text = new Gson().toJson(message);
+		        
+		     	 	System.out.println(message.getExchangeName()+message.getDevice()+
+		     	 					message.getTitle()+message.getText()+message.getNotificationName()	
+		     	 			);
 		     	 	if(isNullOrEmpty(message.getExchangeName()) ||
 		     	 	   isNullOrEmpty(message.getDevice()) ||
 		     	 	   isNullOrEmpty(message.getTitle()) ||

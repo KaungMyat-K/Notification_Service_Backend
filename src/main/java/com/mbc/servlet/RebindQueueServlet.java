@@ -52,18 +52,34 @@ public class RebindQueueServlet extends HttpServlet {
 	        notificationService.unbindQueue(exchangeToUnbind, 
 												data.getQueue(), 
 												notificationService.createRoutingKey(exchangeToUnbind,data.getDevice())
-												);
+												);	                
 	        
+	        
+	        //create exchange name for a single user
+	        String exchangeForSingleUser = data.getNewExchange().contains("_") ? 
+	        								String.format("%s_%s",data.getNewExchange().split("_")[0],data.getUserId()): 
+											String.format("%s_%s",data.getNewExchange(),data.getUserId());
+												
+			//create if exchange not exists 
+			notificationService.createExchange(data.getNewExchange().split("_")[0]);
+			
 	        //create exchange for a single user
-	        notificationService.createExchange(data.getNewExchange());
+	        notificationService.createExchange(exchangeForSingleUser);
 	        
-	        //create if exchange not exists 
-	        notificationService.createExchange(data.getNewExchange());        
 	        
 	        //rebind Queue
-	        String renewRoutingKey = String.format("%s.%s.%s",data.getNewExchange(),"device",data.getDevice());
-	        notificationService.rebindQueue(data.getNewExchange(), data.getQueue(), renewRoutingKey);
-	                
+	        String exchangeToBind = data.getNewExchange().contains("_") ? 
+									data.getNewExchange().split("_")[0] : 
+									data.getNewExchange();
+					
+	        String renewRoutingKey = notificationService.createRoutingKey(exchangeToBind, data.getDevice());
+	        notificationService.rebindQueue(exchangeToBind, data.getQueue(), renewRoutingKey);
+	        
+	        //rebind Queue for a single user
+	        String routingKeyForSingleUser = notificationService.createRoutingKey(exchangeForSingleUser, data.getDevice());
+	        notificationService.rebindQueue(exchangeForSingleUser, data.getQueue(), routingKeyForSingleUser);
+	               
+	        
 	        ResponseUtils.sendSuccess(
 				    			response,
 				    			"rebound queue successfully"
