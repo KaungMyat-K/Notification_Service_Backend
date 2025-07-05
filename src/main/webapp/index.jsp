@@ -18,7 +18,7 @@
           <h2>Notification</h2>
           
           
-		    
+		    <form id="notificationForm" enctype="multipart/form-data"> 
 		 <label for="exchangeName">Exchange Name</label>
           <input id="exchangeName" type="text" placeholder="Enter Exchange Name" />
           
@@ -46,7 +46,9 @@
 	    	<input type="file" id="fileInput" name="image" accept="image/*" />
 	  	</div>
           
-          <button id="sendButton" type="button" class="send-button">Send Notification</button>
+          <button id="sendButton" type="submit" class="send-button">Send Notification</button>
+          
+          </form>
         </div>
 
         <div class="preview-container">

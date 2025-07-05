@@ -1,86 +1,127 @@
-$(document).ready(function() {
-	
-	function getContextPath() {
-	    return `${window.location.host}/${window.location.pathname.split('/')[1]}`;
-	}
+document.addEventListener('DOMContentLoaded', function() {
+    // Get context path
+    const BASE_URL = window.location.pathname.split('/')[1] ? `/${window.location.pathname.split('/')[1]}` : '';
 
-	const BASE_URL = `/${getContextPath()}`;
-	
-	function showToast(message, type = "success") {
-	    const $toast = $("#toast");
-	    $toast.removeClass().addClass(`toast show ${type}`);
-	    $toast.text(message);
-
-	    setTimeout(() => {
-	        $toast.removeClass("show");
-	    }, 3000);
-	}
-	
-	let selectedFile = null;
-	
-    function updatePreview() {
-        const title = $("#notificationTitle").val() || "Notification Title";
-        const text = $("#notificationText").val() || "Notification Text";
-        const imageUrl = $(".image-url-input").val();
-        
-
-        $(".notification-content .text strong").text(title);
-        $(".notification-content .text").contents().last()[0].textContent = " " + text;
-        
-
-        $(".iphone-notification-content .iphone-text strong").text(title);
-        $(".iphone-notification-content .iphone-text").contents().last()[0].textContent = " " + text;
-        
-
-        const imagePreviewHtml = selectedFile
-        ? `<img src="${URL.createObjectURL(selectedFile)}" alt="Notification Image">`
-        : "🖼️";
-        
-        $(".image-placeholder").html(imagePreviewHtml);
-        $(".iphone-image-placeholder").html(imagePreviewHtml);
-        
+    // Toast notification function
+    function showToast(message, type = "success") {
+        const toast = document.getElementById("toast");
+        toast.className = `toast show ${type}`;
+        toast.textContent = message;
+        setTimeout(() => toast.classList.remove("show"), 3000);
     }
 
-    $("#notificationTitle, #notificationText").on('input', updatePreview);
-    $(".notification-form select").on('change', updatePreview);
-    
-    const $fileInput = $("#fileInput");
+    let selectedFile = null;
+    let currentObjectUrl = null;
 
-    $fileInput.on("change", function (event) {
-      selectedFile = event.target.files[0];
-      if (selectedFile) {
-        const maxSizeBytes = 2 * 1024 * 1024;
-        if (selectedFile.size > maxSizeBytes) {
-          showToast("File size exceeds 2 MB limit", "error");
-          $(this).val("");
-          selectedFile = null;
-          return;
+    // Update preview function
+    function updatePreview() {
+        const title = document.getElementById("notificationTitle").value || "Notification Title";
+        const text = document.getElementById("notificationText").value || "Notification Text";
+
+        document.querySelectorAll(".text strong, .iphone-text strong").forEach(el => {
+            el.textContent = title;
+        });
+        document.querySelectorAll(".text, .iphone-text").forEach(el => {
+            if (el.lastChild) el.lastChild.textContent = " " + text;
+        });
+
+        const imagePreviewHtml = selectedFile ? 
+            `<img src="${URL.createObjectURL(selectedFile)}" alt="Notification Image">` : "🖼️";
+        document.querySelectorAll(".image-placeholder, .iphone-image-placeholder").forEach(el => {
+            el.innerHTML = imagePreviewHtml;
+        });
+    }
+
+    // Event listeners
+    document.getElementById("notificationTitle").addEventListener('input', updatePreview);
+    document.getElementById("notificationText").addEventListener('input', updatePreview);
+    document.getElementById("device").addEventListener('change', updatePreview);
+
+    // File input handler
+    document.getElementById("fileInput").addEventListener('change', function(e) {
+        if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
+        selectedFile = e.target.files[0];
+        
+        if (selectedFile) {
+            if (selectedFile.size > 2 * 1024 * 1024) {
+                showToast("File size exceeds 2 MB limit", "error");
+                e.target.value = "";
+                selectedFile = null;
+                return;
+            }
+            if (!selectedFile.type.startsWith('image/')) {
+                showToast("Only image files are allowed", "error");
+                e.target.value = "";
+                selectedFile = null;
+                return;
+            }
         }
-      }
-      updatePreview();
+        updatePreview();
     });
-    
-    $("#sendButton").on('click',function(e) {
+
+    // Form submission handler
+    document.getElementById("notificationForm").addEventListener('submit', function(e) {
         e.preventDefault();
-        console.log("selectedFile value:", selectedFile);
-        const notificationData = {
-        	exchangeName: $("#exchangeName").val(),
-        	device: $("#device").val(),
-            title: $("#notificationTitle").val(),
-            text: $("#notificationText").val(),
-            notificationName: $("#notificationName").val() || "System",
-            image: selectedFile ? selectedFile : ""
+
+        // Validate required fields
+        const requiredFields = {
+            exchangeName: document.getElementById("exchangeName").value.trim(),
+            title: document.getElementById("notificationTitle").value.trim(),
+            text: document.getElementById("notificationText").value.trim()
         };
-        console.log("data",notificationData);
-        $.post(`/${BASE_URL}/send`, notificationData)
-            .done(function(response) {
-            	showToast("Notification sent successfully!", "success");
-            	console.log("Notification sent successfully!", response.message);
-            })
-            .fail(function(error) {
-            	showToast("Failed to send notification", "error");
-            	console.log("Failed to send notification", error.message);
-                console.error("Error:", error);
-            });
-    }); 
+
+        if (Object.values(requiredFields).some(value => !value)) {
+            showToast("Please fill all required fields", "error");
+            return;
+        }
+
+        // Create FormData and append all fields
+        const formData = new FormData();
+        formData.append("exchangeName", requiredFields.exchangeName);
+        formData.append("device", document.getElementById("device").value);
+        formData.append("title", requiredFields.title);
+        formData.append("text", requiredFields.text);
+        formData.append("notificationName", 
+            document.getElementById("notificationName").value.trim() || "System");
+        
+        if (selectedFile) {
+            formData.append("image", selectedFile);
+        }
+
+        // Debug output
+        console.log("FormData contents:");
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
+
+        // Send request
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${BASE_URL}/send`, true);
+
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    showToast(response.message || "Notification sent successfully!", "success");
+                    resetForm();
+                } catch (e) {
+                    showToast("Notification sent successfully!", "success");
+                    resetForm();
+                }
+            } else {
+                showToast(`Error: ${xhr.statusText}`, "error");
+            }
+        };
+
+        xhr.onerror = () => showToast("Network error", "error");
+        xhr.send(formData);
+    });
+
+    function resetForm() {
+        document.getElementById("notificationForm").reset();
+        if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
+        currentObjectUrl = null;
+        selectedFile = null;
+        updatePreview();
+    }
 });
