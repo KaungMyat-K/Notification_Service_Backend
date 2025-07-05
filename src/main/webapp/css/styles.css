@@ -236,16 +236,6 @@ body {
   text-align: left;
 }
 
-.image-placeholder {
-  width: 36px;
-  height: 36px;
-  background-color: #555;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-}
 
 .label {
   font-size: 13px;
@@ -373,16 +363,7 @@ body {
   text-align: left;
 }
 
-.iphone-image-placeholder {
-  width: 36px;
-  height: 36px;
-  background-color: #555;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-}
+
 
 .select-container {
   display: flex;
@@ -409,7 +390,7 @@ body {
   max-width: 100%;
   max-height: 150px;
   border-radius: 8px;
-  margin-top: 10px;
+
 }
 
 select {
@@ -423,6 +404,28 @@ select {
 
 .image-url-input {
   width: calc(100% - 40px);
+}
+
+.image-placeholder,.iphone-image-placeholder {
+  width: 36px;
+  height: 36px;
+  background-color: #555;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+
+.image-placeholder img,
+.iphone-image-placeholder img  {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+
 }
 
 /* Toast Styles */

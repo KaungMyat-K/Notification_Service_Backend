@@ -1,6 +1,5 @@
 package com.mbc.servlet;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Date;
 
@@ -41,9 +40,8 @@ public class NotificationServlet extends HttpServlet {
 		        	    .build();
 	     	 		String text = new Gson().toJson(message);
 		        
-		     	 	System.out.println(message.getExchangeName()+message.getDevice()+
-		     	 					message.getTitle()+message.getText()+message.getNotificationName()	
-		     	 			);
+		     	 	System.out.println(request.getParameter("image"));
+		     	 	
 		     	 	if(isNullOrEmpty(message.getExchangeName()) ||
 		     	 	   isNullOrEmpty(message.getDevice()) ||
 		     	 	   isNullOrEmpty(message.getTitle()) ||
@@ -71,7 +69,7 @@ public class NotificationServlet extends HttpServlet {
 					
 					
 					
-					notificationService.sendMessage(message.getExchangeName(), text,routingKey);
+					//notificationService.sendMessage(message.getExchangeName(), text,routingKey);
 					
 					ResponseUtils.sendSuccess(
 				        	    			response,

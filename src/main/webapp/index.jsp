@@ -43,17 +43,8 @@
 
          <label>Notification image (optional)</label>
 		<div class="image-input-container">
-		  <input
-		    type="text"
-		    id="notificationImage"
-		    placeholder="Example: https://yourapp.com/image.png"
-		    class="image-url-input"
-		  />
-		  <button type="button" class="upload-button" id="uploadBtn">
-		    <i class="fas fa-upload"></i>
-		  </button>
-		  <input type="file" id="fileInput" accept="image/*" style="display: none;" />
-		</div>
+	    	<input type="file" id="fileInput" name="image" accept="image/*" />
+	  	</div>
           
           <button id="sendButton" type="button" class="send-button">Send Notification</button>
         </div>

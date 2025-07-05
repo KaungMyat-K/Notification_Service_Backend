@@ -1,4 +1,4 @@
 docker pull rabbitmq:4.1.1-management
 docker run --rm -it -p 15672:15672 -p 5672:5672 -p 15674:15674 rabbitmq:4.1.1-management
-docker exec -it c8ca712f0c6e065fd54ebadace472778b40de602768477fa4757182b714abdfa bash
+docker exec -it 3b23bc5297b02ec172a2f9e56d91426e022aca5493c4ac2c6bd150cb6ad65b12 bash
 rabbitmq-plugins enable rabbitmq_web_stomp

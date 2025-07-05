@@ -16,6 +16,8 @@ $(document).ready(function() {
 	    }, 3000);
 	}
 	
+	let selectedFile = null;
+	
     function updatePreview() {
         const title = $("#notificationTitle").val() || "Notification Title";
         const text = $("#notificationText").val() || "Notification Text";
@@ -30,62 +32,46 @@ $(document).ready(function() {
         $(".iphone-notification-content .iphone-text").contents().last()[0].textContent = " " + text;
         
 
-        const imagePlaceholder = imageUrl ? 
-            `<img src="${imageUrl}" alt="Notification Image">` : "🖼️";
-        $(".image-placeholder, .iphone-image-placeholder").html(imagePlaceholder);
+        const imagePreviewHtml = selectedFile
+        ? `<img src="${URL.createObjectURL(selectedFile)}" alt="Notification Image">`
+        : "🖼️";
+        
+        $(".image-placeholder").html(imagePreviewHtml);
+        $(".iphone-image-placeholder").html(imagePreviewHtml);
+        
     }
 
-    $("#notificationTitle, #notificationText, .image-url-input").on('input', updatePreview);
+    $("#notificationTitle, #notificationText").on('input', updatePreview);
     $(".notification-form select").on('change', updatePreview);
     
-    const $input = $("#notificationImage");
-    const $uploadBtn = $("#uploadBtn");
     const $fileInput = $("#fileInput");
 
-    $input.on("input", function () {
-        const hasValue = $(this).val().trim() !== "";
-        $uploadBtn.prop("disabled", hasValue);
-        if (!hasValue) {
-            $fileInput.val("");
-            $input.prop("disabled", false);
-        }
-    });
-
-    $uploadBtn.on("click", function () {
-        if (!$(this).prop("disabled")) {
-            console.log("Upload button clicked");
-            $fileInput.click();
-        }
-    });
-
     $fileInput.on("change", function (event) {
-        const file = event.target.files[0];
-        if (file) {
-            const maxSizeBytes = 2 * 1024 * 1024;
-
-            if (file.size > maxSizeBytes) {
-                alert("File size exceeds 2 MB limit.");
-                $(this).val(""); 
-                return;
-            }
-            const imageUrl = URL.createObjectURL(file);
-            console.log("Image selected:", imageUrl);
-            $input.val(imageUrl).trigger("input");
-            $input.prop("disabled", true); 
+      selectedFile = event.target.files[0];
+      if (selectedFile) {
+        const maxSizeBytes = 2 * 1024 * 1024;
+        if (selectedFile.size > maxSizeBytes) {
+          showToast("File size exceeds 2 MB limit", "error");
+          $(this).val("");
+          selectedFile = null;
+          return;
         }
+      }
+      updatePreview();
     });
     
     $("#sendButton").on('click',function(e) {
         e.preventDefault();
-        console.log("Exchange name input value:", $("#exchangeName").val());
+        console.log("selectedFile value:", selectedFile);
         const notificationData = {
         	exchangeName: $("#exchangeName").val(),
         	device: $("#device").val(),
             title: $("#notificationTitle").val(),
             text: $("#notificationText").val(),
             notificationName: $("#notificationName").val() || "System",
-            imageUrl: $(".image-url-input").val() || ""
+            image: selectedFile ? selectedFile : ""
         };
+        console.log("data",notificationData);
         $.post(`/${BASE_URL}/send`, notificationData)
             .done(function(response) {
             	showToast("Notification sent successfully!", "success");

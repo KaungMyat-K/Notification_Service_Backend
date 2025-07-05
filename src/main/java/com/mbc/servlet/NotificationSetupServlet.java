@@ -54,6 +54,17 @@ public class NotificationSetupServlet extends HttpServlet {
 	            return;
 	        }
 	        
+	        data.setDevice(data.getDevice().toLowerCase());
+	        
+	        if(!data.getDevice().equals("ios") && !data.getDevice().equals("android")) {
+	        	ResponseUtils.sendError(
+								    response,
+								    HttpServletResponse.SC_BAD_REQUEST,
+								    "Error while creating exchange and queue: device format is wrong"
+								);
+	        	return;
+	        }        
+	        
 	        String exchangeName = data.getClientId()+"_"+data.getUserId();	       	        
 	        
 	        //create Exchange
