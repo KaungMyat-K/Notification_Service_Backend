@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Date;
+import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -15,7 +16,9 @@ import javax.servlet.http.Part;
 
 import com.google.gson.Gson;
 import com.mbc.model.NotificationMessage;
+import com.mbc.services.NotificationHistoryService;
 import com.mbc.services.NotificationService;
+import com.mbc.servicesImpl.NotificationHistoryServiceImpl;
 import com.mbc.servicesImpl.NotificationServiceImpl;
 import com.mbc.utility.ResponseUtils;
 
@@ -30,14 +33,21 @@ public class NotificationServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
 	private NotificationService notificationService;
+	private NotificationHistoryService notificationHistoryService;
+	private Properties config ;
+	
+	
 	
 	@Override
     public void init() {
         this.notificationService = new NotificationServiceImpl();
+        this.notificationHistoryService = new NotificationHistoryServiceImpl();
+        this.config = (Properties) getServletContext().getAttribute("config");
     }
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		 try {
+			 
 			 
 			 Part filePart = request.getPart("image");
 	            String imageFileName = null;
@@ -46,7 +56,7 @@ public class NotificationServlet extends HttpServlet {
 	            if (filePart != null && filePart.getSize() > 0) {
 	                imageFileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
 	                
-	                // Save the file to server
+	          
 	                String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
 	                File uploadDir = new File(uploadPath);
 	                if (!uploadDir.exists()) uploadDir.mkdir();
@@ -66,11 +76,8 @@ public class NotificationServlet extends HttpServlet {
 		        	    .notificationName(request.getParameter("notificationName"))
 		        	    .imageUrl(imagePath)
 		        	    .timestamp(new Date())
-		        	    .build();			 	
-			
-			 	
-	     	 		String text = new Gson().toJson(message);	     	 				    
-		     	 	
+		        	    .build();			 		     	 			     	 				    
+		   	 	
 		     	 	if(isNullOrEmpty(message.getExchangeName()) ||
 		     	 	   isNullOrEmpty(message.getDevice()) ||
 		     	 	   isNullOrEmpty(message.getTitle()) ||
@@ -93,12 +100,16 @@ public class NotificationServlet extends HttpServlet {
 										);
 							return;
 						}	
-		     	 		
-					String routingKey = String.format("%s.%s.%s",message.getExchangeName(),"device",message.getDevice());
+		     	 	String text = new Gson().toJson(message);
+		     	 	
+					String routingKey = String.format("%s.%s.%s",message.getExchangeName(),"device",message.getDevice());				
 					
+					notificationService.sendMessage(message.getExchangeName(), text,routingKey);		
 					
+					String apiUrl = config.getProperty("external.api") + String.format("/saveNotificationHistoryToAll?title=%s&body=%s",message.getTitle(),message.getText());
+					String apiKey = config.getProperty("external.apiKey");
 					
-					notificationService.sendMessage(message.getExchangeName(), text,routingKey);
+					notificationHistoryService.sendNotificationHistroyToAll(apiUrl, apiKey);
 					
 					ResponseUtils.sendSuccess(
 				        	    			response,
